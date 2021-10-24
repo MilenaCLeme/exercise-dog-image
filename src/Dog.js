@@ -17,12 +17,31 @@ class Dog extends React.Component {
     this.chamarApi();
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    const http = nextState.foto;
+    const numero = http.indexOf('terrier');
+    const IdentificaQueNãoExisteAPalavra = -1;
+    if (numero === IdentificaQueNãoExisteAPalavra) {
+      localStorage.setItem('foto', http);
+      return true;
+    }
+    const imagem = localStorage.getItem('foto');
+    this.setState({
+      foto: imagem,
+    });
+    return false;
+  }
+
+  componentDidUpdate() {
+  }
+
   async chamarApi() {
     const url = 'https://dog.ceo/api/breeds/image/random';
     const api = await fetch(url);
     const resultado = await api.json();
     if (resultado.status === 'success') {
       const fotoAnimal = resultado.message;
+      this.verificaRaça(fotoAnimal);
       this.setState({
         foto: fotoAnimal,
         carregou: true,
@@ -30,14 +49,16 @@ class Dog extends React.Component {
     }
   }
 
+  verificaRaça(fotoAnimal) {
+    const separarNomeDaHttp = fotoAnimal.split('/');
+    global.alert(separarNomeDaHttp[4]);
+  }
+
   chamarNovoDog() {
     this.setState({
       carregou: false,
     });
-    const tempo = 200;
-    setTimeout(() => {
-      this.chamarApi();
-    }, tempo);
+    this.chamarApi();
   }
 
   render() {
